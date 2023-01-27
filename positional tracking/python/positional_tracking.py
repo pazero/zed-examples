@@ -52,7 +52,7 @@ if __name__ == "__main__":
 
     runtime = sl.RuntimeParameters()
     camera_pose = sl.Pose()
-
+    print("camera_pose: ", camera_pose)
     camera_info = zed.get_camera_information()
     # Create OpenGL viewer
     viewer = gl.GLViewer()
@@ -63,6 +63,8 @@ if __name__ == "__main__":
 
     text_translation = ""
     text_rotation = ""
+    text_accuracy = ""
+    text_confidence = ""
 
     while viewer.is_available():
         if zed.grab(runtime) == sl.ERROR_CODE.SUCCESS:
@@ -72,6 +74,7 @@ if __name__ == "__main__":
                 translation = camera_pose.get_translation(py_translation)
                 text_rotation = str(("{:.3f}".format(rotation[0]), "{:.3f}".format(rotation[1]), "{:.3f}".format(rotation[2])))
                 text_translation = str(("{:.3f}".format(translation.get()[0]), "{:.3f}".format(translation.get()[1]), "{:.3f}".format(translation.get()[2])))
+                #text_accuracy = str(())
                 pose_data = camera_pose.pose_data(sl.Transform())
             viewer.updateData(pose_data, text_translation, text_rotation, tracking_state)
 
