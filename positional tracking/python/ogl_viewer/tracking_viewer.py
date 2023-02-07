@@ -169,6 +169,7 @@ class GLViewer:
         self.trackState = sl.POSITIONAL_TRACKING_STATE
         self.txtT = ""
         self.txtR = ""
+        self.txtC = ""
 
     def init(self, camera_model): # _params = sl.CameraParameters
         glutInit()
@@ -278,13 +279,14 @@ class GLViewer:
             glutMainLoopEvent()
         return self.available
 
-    def updateData(self, zed_rt, str_t, str_r, state):
+    def updateData(self, zed_rt, str_t, str_r, state, confidence):
         self.mutex.acquire()
         self.pose = zed_rt
         self.zedPath.add_point_clr(zed_rt.get_translation().get(), [0.1,0.36,0.84])
         self.trackState = state
         self.txtT = str_t
         self.txtR = str_r
+        self.txtC = str(confidence)
         self.mutex.release()
 
     def idle(self):
@@ -440,6 +442,14 @@ class GLViewer:
         glColor3f(0.4980, 0.5490, 0.5529)
         glRasterPos2i(155, start_h - 50)
         safe_glutBitmapString(GLUT_BITMAP_HELVETICA_18, self.txtR)
+
+        glColor3f(dark_clr, dark_clr, dark_clr)
+        glRasterPos2i(start_w, start_h - 75)
+        safe_glutBitmapString(GLUT_BITMAP_HELVETICA_18, "Confidence :")
+
+        glColor3f(0.4980, 0.5490, 0.5529)
+        glRasterPos2i(155, start_h - 75)
+        safe_glutBitmapString(GLUT_BITMAP_HELVETICA_18, self.txtC)
 
         glMatrixMode(GL_PROJECTION)
         glPopMatrix()
