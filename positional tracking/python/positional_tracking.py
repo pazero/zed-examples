@@ -40,6 +40,33 @@ def print_pose_value(pose):
     print("translation: ", translation)
     #print("covarianza: ", pose.pose_covariance)
 
+
+class TimestampHandler:
+    def __init__(self):
+        self.t_imu = sl.Timestamp()
+        self.t_baro = sl.Timestamp()
+        self.t_mag = sl.Timestamp()
+
+    ##
+    # check if the new timestamp is higher than the reference one, and if yes, save the current as reference
+    def is_new(self, sensor):
+        if (isinstance(sensor, sl.IMUData)):
+            new_ = (sensor.timestamp.get_microseconds() > self.t_imu.get_microseconds())
+            if new_:
+                self.t_imu = sensor.timestamp
+            return new_
+        elif (isinstance(sensor, sl.MagnetometerData)):
+            new_ = (sensor.timestamp.get_microseconds() > self.t_mag.get_microseconds())
+            if new_:
+                self.t_mag = sensor.timestamp
+            return new_
+        elif (isinstance(sensor, sl.BarometerData)):
+            new_ = (sensor.timestamp.get_microseconds() > self.t_baro.get_microseconds())
+            if new_:
+                self.t_baro = sensor.timestamp
+            return new_
+
+
 if __name__ == "__main__":
 
     init_params = sl.InitParameters(camera_resolution=sl.RESOLUTION.HD720,
@@ -54,16 +81,28 @@ if __name__ == "__main__":
         init_params.set_from_svo_file(filepath)
 
     zed = sl.Camera()
+
+
     status = zed.open(init_params)
     if status != sl.ERROR_CODE.SUCCESS:
         print(repr(status))
         exit()
-
+    #tracking_params.confidence_threshold = 100;
     tracking_params = sl.PositionalTrackingParameters()
-    zed.enable_positional_tracking(tracking_params)
+    #tracking_params.enable_area_memory = False
+    #mem_area = False if tracking_params.enable_area_memory is False else True
 
+    #tracking_params.area_file_path = "C:\\Users\\Paolo\\Documents\\zed-examples\\positional tracking\\memorized_area"
+    #tracking_params.area_file_path = "./my_area"
+    zed.enable_positional_tracking(tracking_params)
     runtime = sl.RuntimeParameters()
+    runtime.confidence_threshold = 48
+    runtime.texture_confidence_threshold = 39
     camera_pose = sl.Pose()
+    #imu_sensor = sl.IMUData()
+    #sl.SensorsData.init_sensorsData(sl.SensorsData)
+    sensors_data = sl.SensorsData()
+    ts_handler = TimestampHandler()
 
     camera_info = zed.get_camera_information()
     # Create OpenGL viewer
@@ -80,8 +119,15 @@ if __name__ == "__main__":
 
     while viewer.is_available():
         if zed.grab(runtime) == sl.ERROR_CODE.SUCCESS:
+            if zed.get_sensors_data(sensors_data, sl.TIME_REFERENCE.CURRENT) == sl.ERROR_CODE.SUCCESS:
+                if ts_handler.is_new(sensors_data.get_imu_data()):
+                    linear_acceleration = sensors_data.get_imu_data().get_linear_acceleration()
+                    print(" \t Acceleration: [ {0} {1} {2} ] [m/sec^2]".format(linear_acceleration[0], linear_acceleration[1],linear_acceleration[2]))
+                    angular_velocity = sensors_data.get_imu_data().get_angular_velocity()
+                    print(" \t Angular Velocities: [ {0} {1} {2} ] [deg/sec]".format(angular_velocity[0],angular_velocity[1],angular_velocity[2]))
+                    print("pose: {0}".format(sensors_data.get_imu_data().get_pose()))
             tracking_state = zed.get_position(camera_pose)
-            print_pose_value(camera_pose)
+            #print_pose_value(camera_pose)
             if tracking_state == sl.POSITIONAL_TRACKING_STATE.OK:
                 rotation = camera_pose.get_rotation_vector()
                 translation = camera_pose.get_translation(py_translation)
@@ -93,4 +139,6 @@ if __name__ == "__main__":
             viewer.updateData(pose_data, text_translation, text_rotation, tracking_state, camera_pose.pose_confidence)
 
     viewer.exit()
+    #zed.disable_positional_tracking(area_file_path="C:\\Users\\Paolo\\Documents\\zed-examples\\positional tracking\\memorized_area")
+    #zed.save_area_map(area_file_path=".\\my_area")
     zed.close()
