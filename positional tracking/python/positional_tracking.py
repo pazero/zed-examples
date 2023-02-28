@@ -90,7 +90,7 @@ if __name__ == "__main__":
     #tracking_params.confidence_threshold = 100;
     tracking_params = sl.PositionalTrackingParameters()
     #tracking_params.enable_area_memory = False
-    #mem_area = False if tracking_params.enable_area_memory is False else True
+    mem_area = False if tracking_params.enable_area_memory is False else True
 
     #tracking_params.area_file_path = "C:\\Users\\Paolo\\Documents\\zed-examples\\positional tracking\\memorized_area"
     #tracking_params.area_file_path = "./my_area"
@@ -98,10 +98,9 @@ if __name__ == "__main__":
     runtime = sl.RuntimeParameters()
     runtime.confidence_threshold = 48
     runtime.texture_confidence_threshold = 39
-    camera_pose = sl.Pose()
-    #imu_sensor = sl.IMUData()
-    #sl.SensorsData.init_sensorsData(sl.SensorsData)
+
     sensors_data = sl.SensorsData()
+    camera_pose = sl.Pose()
     ts_handler = TimestampHandler()
 
     camera_info = zed.get_camera_information()
@@ -122,10 +121,12 @@ if __name__ == "__main__":
             if zed.get_sensors_data(sensors_data, sl.TIME_REFERENCE.CURRENT) == sl.ERROR_CODE.SUCCESS:
                 if ts_handler.is_new(sensors_data.get_imu_data()):
                     linear_acceleration = sensors_data.get_imu_data().get_linear_acceleration()
-                    print(" \t Acceleration: [ {0} {1} {2} ] [m/sec^2]".format(linear_acceleration[0], linear_acceleration[1],linear_acceleration[2]))
+                    #print(" \t Acceleration: [ {0:.3f} {1:.3f} {2:.3f} ] [m/sec^2]".format(linear_acceleration[0], linear_acceleration[1],linear_acceleration[2]))
                     angular_velocity = sensors_data.get_imu_data().get_angular_velocity()
-                    print(" \t Angular Velocities: [ {0} {1} {2} ] [deg/sec]".format(angular_velocity[0],angular_velocity[1],angular_velocity[2]))
-                    print("pose: {0}".format(sensors_data.get_imu_data().get_pose()))
+                    text_velocity = str(("{:.3f}".format(angular_velocity[0]), "{:.3f}".format(angular_velocity[1]), "{:.3f}".format(angular_velocity[2])))
+                    text_acceleration = str(("{:.3f}".format(linear_acceleration[0]), "{:.3f}".format(linear_acceleration[1]), "{:.3f}".format(linear_acceleration[2])))
+                    #print(" \t Angular Velocities: [ {0:.3f} {1:.3f} {2:.3f} ] [deg/sec]".format(angular_velocity[0],angular_velocity[1],angular_velocity[2]))
+                    #print("pose: {0}".format(sensors_data.get_imu_data().get_pose()))
             tracking_state = zed.get_position(camera_pose)
             #print_pose_value(camera_pose)
             if tracking_state == sl.POSITIONAL_TRACKING_STATE.OK:
@@ -133,10 +134,9 @@ if __name__ == "__main__":
                 translation = camera_pose.get_translation(py_translation)
                 text_rotation = str(("{:.3f}".format(rotation[0]), "{:.3f}".format(rotation[1]), "{:.3f}".format(rotation[2])))
                 text_translation = str(("{:.3f}".format(translation.get()[0]), "{:.3f}".format(translation.get()[1]), "{:.3f}".format(translation.get()[2])))
-            
                 #text_accuracy = str(())
                 pose_data = camera_pose.pose_data(sl.Transform())
-            viewer.updateData(pose_data, text_translation, text_rotation, tracking_state, camera_pose.pose_confidence)
+            viewer.updateData(pose_data, text_translation, text_rotation, tracking_state, camera_pose.pose_confidence, mem_area, text_velocity, text_acceleration)
 
     viewer.exit()
     #zed.disable_positional_tracking(area_file_path="C:\\Users\\Paolo\\Documents\\zed-examples\\positional tracking\\memorized_area")

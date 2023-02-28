@@ -170,6 +170,9 @@ class GLViewer:
         self.txtT = ""
         self.txtR = ""
         self.txtC = ""
+        self.mem_area =""
+        self.vel =""
+        self.acc =""
 
     def init(self, camera_model): # _params = sl.CameraParameters
         glutInit()
@@ -279,7 +282,7 @@ class GLViewer:
             glutMainLoopEvent()
         return self.available
 
-    def updateData(self, zed_rt, str_t, str_r, state, confidence):
+    def updateData(self, zed_rt, str_t, str_r, state, confidence, mem_area, vel, acc):
         self.mutex.acquire()
         self.pose = zed_rt
         self.zedPath.add_point_clr(zed_rt.get_translation().get(), [0.1,0.36,0.84])
@@ -287,6 +290,9 @@ class GLViewer:
         self.txtT = str_t
         self.txtR = str_r
         self.txtC = str(confidence)
+        self.mem_area = str(mem_area)
+        self.vel = str(vel)
+        self.acc = str(acc)
         self.mutex.release()
 
     def idle(self):
@@ -450,6 +456,30 @@ class GLViewer:
         glColor3f(0.4980, 0.5490, 0.5529)
         glRasterPos2i(155, start_h - 75)
         safe_glutBitmapString(GLUT_BITMAP_HELVETICA_18, self.txtC)
+
+        glColor3f(dark_clr, dark_clr, dark_clr)
+        glRasterPos2i(start_w, start_h - 100)
+        safe_glutBitmapString(GLUT_BITMAP_HELVETICA_18, "Area memory:")
+
+        glColor3f(0.4980, 0.5490, 0.5529)
+        glRasterPos2i(155, start_h - 100)
+        safe_glutBitmapString(GLUT_BITMAP_HELVETICA_18, self.mem_area)
+
+        glColor3f(dark_clr, dark_clr, dark_clr)
+        glRasterPos2i(start_w, start_h - 125)
+        safe_glutBitmapString(GLUT_BITMAP_HELVETICA_18, "Angular velocity:")
+
+        glColor3f(0.4980, 0.5490, 0.5529)
+        glRasterPos2i(180, start_h - 125)
+        safe_glutBitmapString(GLUT_BITMAP_HELVETICA_18, self.vel)
+
+        glColor3f(dark_clr, dark_clr, dark_clr)
+        glRasterPos2i(start_w, start_h - 150)
+        safe_glutBitmapString(GLUT_BITMAP_HELVETICA_18, "Linear acceleration:")
+
+        glColor3f(0.4980, 0.5490, 0.5529)
+        glRasterPos2i(180, start_h - 150)
+        safe_glutBitmapString(GLUT_BITMAP_HELVETICA_18, self.acc)
 
         glMatrixMode(GL_PROJECTION)
         glPopMatrix()
