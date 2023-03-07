@@ -123,7 +123,8 @@ def main():
                 #print("Sample " + str(i))
                 #print("\t - IMU pose:")
                 get_pose = sensors_data.get_imu_data().get_pose()
-                print("\t Translation: ", get_pose.get_translation().get(), "\t Orientation: ", get_pose.get_orientation().get())
+                print(sensors_data.get_imu_data().timestamp.data_ns)
+                #print("\t Translation: ", get_pose.get_translation().get(), "\t Orientation: ", get_pose.get_orientation().get())
                 """print(" - IMU:")
                 # Filtered orientation quaternion
                 quaternion = sensors_data.get_imu_data().get_pose().get_orientation().get()
@@ -149,7 +150,7 @@ def main():
 """
                 i = i+1
 
-                time.sleep(.3)
+                #time.sleep(.3)
                 #input("Press Enter to continue...")
 
 
