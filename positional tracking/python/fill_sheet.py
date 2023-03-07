@@ -28,6 +28,7 @@ import numpy as np
 import math
 import time
 import locale
+import time
 
 
 # locale.setlocale(locale.LC_ALL, 'nl_NL')
@@ -57,6 +58,19 @@ class TimestampHandler:
             if new_:
                 self.t_baro = sensor.timestamp
             return new_
+
+
+def printSensorParameters(sensor_parameters):
+    if sensor_parameters.is_available:
+        print("*****************************")
+        print("Sensor type: " + str(sensor_parameters.sensor_type))
+        print("Max rate: "  + str(sensor_parameters.sampling_rate) + " "  + str(sl.SENSORS_UNIT.HERTZ))
+        print("Range: "  + str(sensor_parameters.sensor_range) + " "  + str(sensor_parameters.sensor_unit))
+        print("Resolution: " + str(sensor_parameters.resolution) + " "  + str(sensor_parameters.sensor_unit))
+        if not math.isnan(sensor_parameters.noise_density):
+            print("Noise Density: "  + str(sensor_parameters.noise_density) + " " + str(sensor_parameters.sensor_unit) + "/√Hz")
+        if not math.isnan(sensor_parameters.random_walk):
+            print("Random Walk: "  + str(sensor_parameters.random_walk) + " " + str(sensor_parameters.sensor_unit) + "/s/√Hz")
 
 
 def write_xlsx(sheet_list):
@@ -146,23 +160,30 @@ def main():
         exit(1)
 
     # Used to store the sensors timestamp to know if the sensors_data is a new one or not
+
+    printSensorParameters(info.sensors_configuration.accelerometer_parameters)  # accelerometer configuration
+    printSensorParameters(info.sensors_configuration.gyroscope_parameters)  # gyroscope configuration
+    printSensorParameters(info.sensors_configuration.magnetometer_parameters)  # magnetometer configuration
+    printSensorParameters(info.sensors_configuration.barometer_parameters)  # barometer configuration
+
+    data_list = []
     ts_handler = TimestampHandler()
     sensors_data = sl.SensorsData()
-    data_list = []
     i = 0
-    while i < 10000:
+    while i < 100:
         if zed.get_sensors_data(sensors_data, sl.TIME_REFERENCE.CURRENT) == sl.ERROR_CODE.SUCCESS:
             # Check if the data has been updated since the last time. IMU is the sensor with the highest rate
-
-            if ts_handler.is_new(sensors_data.get_imu_data()):
+            imu_data = sensors_data.get_imu_data()
+            if ts_handler.is_new(imu_data):
                 # da prendere: quaternioni, translation e imu_orientation
-                imu_or = sensors_data.get_imu_data().get_pose().get_orientation().get()
-                imu_vel = sensors_data.get_imu_data().get_angular_velocity()
-                imu_acc = sensors_data.get_imu_data().get_linear_acceleration()
+                #print(imu_data.timestamp.data_ns)
+                imu_or = imu_data.get_pose().get_orientation().get()
+                imu_vel = imu_data.get_angular_velocity()
+                imu_acc = imu_data.get_linear_acceleration()
                 mag_data = sensors_data.get_magnetometer_data().get_magnetic_field_calibrated()
                 tLeft = tRight = tImu = tBar = mov = 0
                 # non restituisce timestamp i dati nella forma giusta
-                imuT = sensors_data.get_imu_data().timestamp.get_seconds()
+                imuT = imu_data.timestamp.data_ns
                 print(imuT)
                 magT = sensors_data.get_magnetometer_data().timestamp.get_seconds()
                 barT = sensors_data.get_barometer_data().timestamp.get_seconds()
@@ -191,6 +212,7 @@ def main():
                 """
                 data_list.append(ImuData.ImuData(imuT, magT, barT, accX, accY, accZ, gyrX, gyrY, gyrZ, magX, magY, magZ, orX, orY, orZ, press, r_alt, mov, tLeft, tRight, tImu, tBar))
                 i += 1
+                time.sleep(0.1)
     write_xlsx(data_list)
     zed.close()
     return 0
