@@ -199,6 +199,7 @@ def main():
                 orX = imu_or[0]
                 orY = imu_or[1]
                 orZ = imu_or[2]
+                #prova
                 press = sensors_data.get_barometer_data().pressure
                 # dà che altitudine relativa è sempre 0.0, nonostante sposti la telecamera in alto
                 r_alt = sensors_data.get_barometer_data().relative_altitude
