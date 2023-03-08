@@ -1,0 +1,59 @@
+installare ZED Python API
+
+manuale guida di riferimento: https://www.stereolabs.com/docs/app-development/python/install/
+
+Per soddisfare i requisiti nencessari bisogna:
+
+1) installare ZED SDK
+	installate la versione 3.7 dal sito https://www.stereolabs.com/developers/release/3.7/
+	(NON la versione 3.8 perché sembra abbia un bug)
+	
+	già l'installer di ZED SDK potrebbe farvi installare CUDA (e tutte le dipendenze necessarie),
+	in tal caso saltate il punto 2) e passate direttamente al 3)
+
+2) installare CUDA
+	se non avete già CUDA installato, l'installer di ZED SDK dovrebbe avervi già proposto in automatico
+	di installare la versione opportuna di CUDA
+	se no dovrebbe funzionare anche installando la versione di CUDA 11.7 dal sito https://developer.nvidia.com/cuda-11-7-0-download-archive
+	anche se nel mio caso c'era già installato CUDA 11.7 e comunque non andava bene
+	quindi il mio consiglio è: disinstallate totalmente CUDA e lasciate fare all'installer di ZED SDK
+
+3) installare python da microsoft store (nel mio caso 3.10)
+	NON usare altri installatori online (come https://www.python.org/downloads/)
+	
+	può capitare che come comando per lanciare i programmi bisogna usare'python3' e non 'python'
+	per verificarlo, basta scrivere sul terminale 'python', se non da errore, allora potete usarlo (la stessa cosa vale per 'python3')
+	ricordartevi di usare il comando giusto e di controllare i comandi quando fate cut&paste
+
+4) installare pip:
+	per prima cosa controllare che pip non sia già installato eseguendo il comando
+
+		pip help
+	
+	se non vi da errore passate al punto successivo, se no significa che non è installato.
+	Per cui, eseguite i seguenti comandi:
+	
+		curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+
+		python get-pip.py
+	
+	verificate l'installazione ripetendo il comando 'pip help'; se non vi dà errore, si è installato correttamente
+	
+
+5) installare cython e numpy:
+	basta il seguente comando:
+		python -m pip install cython numpy
+
+
+
+Ora potete finalmente installare Python API!
+
+Aprite il terminale come amministratori (se no avrete l'errore "PermissionError: [Errno 13] Permission denied:...")
+
+Andate nella cartella C:\Program Files (x86)\ZED SDK\
+
+ed eseguite il comando:
+
+	python get_python_api.py
+
+fine	
