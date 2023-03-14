@@ -73,6 +73,7 @@ def printSensorParameters(sensor_parameters):
             print("Random Walk: "  + str(sensor_parameters.random_walk) + " " + str(sensor_parameters.sensor_unit) + "/s/√Hz")
 
 
+# provare a creare file .ods anziché .xlsx (https://pypi.org/project/odswriter/)
 def write_xlsx(sheet_list):
     if len(sheet_list) == 0:
         return
@@ -181,7 +182,6 @@ def main():
                 imu_vel = imu_data.get_angular_velocity()
                 imu_acc = imu_data.get_linear_acceleration()
                 mag_data = sensors_data.get_magnetometer_data().get_magnetic_field_calibrated()
-                tLeft = tRight = tImu = tBar = mov = 0
                 # non restituisce timestamp i dati nella forma giusta
                 imuT = imu_data.timestamp.data_ns
                 print(imuT)
@@ -201,16 +201,14 @@ def main():
                 orZ = imu_or[2]
                 #prova
                 press = sensors_data.get_barometer_data().pressure
-                # dà che altitudine relativa è sempre 0.0, nonostante sposti la telecamera in alto
+                # ? dà che altitudine relativa è sempre 0.0, nonostante sposti la telecamera in alto
                 r_alt = sensors_data.get_barometer_data().relative_altitude
                 # non restituisce il formato giusto. Inoltre quando sta ferma sembra che dica che si muove
                 mov = sensors_data.camera_moving_state
-                """
-                tLeft = sensors_data.get_temperature_data().get(ONBOARDLEFT)
-                tRight = sensors_data.get_temperature_data.get(ONBOARD_RIGHT)
-                tImu = sensors_data.get_temperature_data().get(IMU)
-                tBar = sensors_data.get_temperature_data(BAROMETER)
-                """
+                tLeft = sensors_data.get_temperature_data().get(sl.ONBOARD_LEFT)
+                tRight = sensors_data.get_temperature_data.get(sl.ONBOARD_RIGHT)
+                tImu = sensors_data.get_temperature_data().get(sl.IMU)
+                tBar = sensors_data.get_temperature_data(sl.BAROMETER)
                 data_list.append(ImuData.ImuData(imuT, magT, barT, accX, accY, accZ, gyrX, gyrY, gyrZ, magX, magY, magZ, orX, orY, orZ, press, r_alt, mov, tLeft, tRight, tImu, tBar))
                 i += 1
                 time.sleep(0.1)
