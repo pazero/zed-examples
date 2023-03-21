@@ -66,6 +66,10 @@ class TimestampHandler:
                 self.t_baro = sensor.timestamp
             return new_
 
+def reboot_btn():
+    print("import FUNZIONA")
+    # zed.reboot(0, true)
+
 
 if __name__ == "__main__":
 
