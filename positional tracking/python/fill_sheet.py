@@ -71,7 +71,11 @@ def printSensorParameters(sensor_parameters):
 # def dot2comma(str):
 
 def write_xlsx(sheet_list):
-    now = str(datetime.datetime.now().day) + '/' + str(datetime.datetime.now().month) + '/' + str(datetime.datetime.now().year) + ' ' + str(datetime.datetime.now().hour) + ':' + str(datetime.datetime.now().minute)
+    now = str(datetime.datetime.now().day) + '/'
+    now += str(datetime.datetime.now().month) + '/'
+    now += str(datetime.datetime.now().year) + ' '
+    now += str(datetime.datetime.now().hour) + ':'
+    now += str(datetime.datetime.now().minute) if datetime.datetime.now().minute > 9 else '0' + str(datetime.datetime.now().minute)
     print(now)
     if len(sheet_list) == 0:
         return
