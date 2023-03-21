@@ -19,16 +19,12 @@
 ########################################################################
 
 import pyzed.sl as sl
+import datetime
 import xlsxwriter
 from varname import nameof
 import ImuData
-import array as arr
-import cv2
-import numpy as np
 import math
-import time
 import locale
-import time
 
 
 # locale.setlocale(locale.LC_ALL, 'nl_NL')
@@ -72,9 +68,11 @@ def printSensorParameters(sensor_parameters):
         if not math.isnan(sensor_parameters.random_walk):
             print("Random Walk: "  + str(sensor_parameters.random_walk) + " " + str(sensor_parameters.sensor_unit) + "/s/√Hz")
 
+# def dot2comma(str):
 
-# provare a creare file .ods anziché .xlsx (https://pypi.org/project/odswriter/)
 def write_xlsx(sheet_list):
+    now = str(datetime.datetime.now().day) + '/' + str(datetime.datetime.now().month) + '/' + str(datetime.datetime.now().year) + ' ' + str(datetime.datetime.now().hour) + ':' + str(datetime.datetime.now().minute)
+    print(now)
     if len(sheet_list) == 0:
         return
     imu = sheet_list[0]
@@ -84,16 +82,17 @@ def write_xlsx(sheet_list):
     # The workbook object is then used to add new worksheet via the add_worksheet() method.
     worksheet = workbook.add_worksheet()
 
-    worksheet.write('A1', 'v1')
-    worksheet.write('A2', nameof(imu.imu_Timestamp) + '[sec]')
-    worksheet.write('B2', nameof(imu.mag_Timestamp) + '[sec]')
-    worksheet.write('C2', nameof(imu.baro_Timestamp) + '[sec]')
+    worksheet.write('A1', 'v2')
+    worksheet.write('B1', now)
+    worksheet.write('A2', nameof(imu.imu_Timestamp) + '[nanosec]')
+    worksheet.write('B2', nameof(imu.mag_Timestamp) + '[nanosec]')
+    worksheet.write('C2', nameof(imu.baro_Timestamp) + '[nanosec]')
     worksheet.write('D2', nameof(imu.accX) + '[m/s^2]')
     worksheet.write('E2', nameof(imu.accY) + '[m/s^2]')
     worksheet.write('F2', nameof(imu.accZ) + '[m/s^2]')
     worksheet.write('G2', nameof(imu.gyroX) + '[deg/s]')
     worksheet.write('H2', nameof(imu.gyroY) + '[deg/S]')
-    worksheet.write('I2', nameof(imu.gyroX) + '[deg/s]')
+    worksheet.write('I2', nameof(imu.gyroZ) + '[deg/s]')
     worksheet.write('J2', nameof(imu.magX) + '[uT]')
     worksheet.write('K2', nameof(imu.magY) + '[uT]')
     worksheet.write('L2', nameof(imu.magZ) + '[uT]')
@@ -118,7 +117,7 @@ def write_xlsx(sheet_list):
         worksheet.write('F' + str(riga), i.accZ)
         worksheet.write('G' + str(riga), i.gyroX)
         worksheet.write('H' + str(riga), i.gyroY)
-        worksheet.write('I' + str(riga), i.gyroX)
+        worksheet.write('I' + str(riga), i.gyroZ)
         worksheet.write('J' + str(riga), i.magX)
         worksheet.write('K' + str(riga), i.magY)
         worksheet.write('L' + str(riga), i.magZ)
@@ -171,7 +170,7 @@ def main():
     ts_handler = TimestampHandler()
     sensors_data = sl.SensorsData()
     i = 0
-    while i < 100:
+    while i < 1000:
         if zed.get_sensors_data(sensors_data, sl.TIME_REFERENCE.CURRENT) == sl.ERROR_CODE.SUCCESS:
             # Check if the data has been updated since the last time. IMU is the sensor with the highest rate
             imu_data = sensors_data.get_imu_data()
@@ -183,10 +182,10 @@ def main():
                 imu_acc = imu_data.get_linear_acceleration()
                 mag_data = sensors_data.get_magnetometer_data().get_magnetic_field_calibrated()
                 # non restituisce timestamp i dati nella forma giusta
-                imuT = imu_data.timestamp.data_ns
-                print(imuT)
-                magT = sensors_data.get_magnetometer_data().timestamp.get_seconds()
-                barT = sensors_data.get_barometer_data().timestamp.get_seconds()
+                imuT = 0.000000001 * imu_data.timestamp.data_ns
+                # print(imuT)
+                magT = 0.000000001 * sensors_data.get_magnetometer_data().timestamp.data_ns
+                barT = 0.000000001 * sensors_data.get_barometer_data().timestamp.data_ns
                 accX = imu_acc[0]
                 accY = imu_acc[1]
                 accZ = imu_acc[2]
@@ -201,17 +200,20 @@ def main():
                 orZ = imu_or[2]
                 #prova
                 press = sensors_data.get_barometer_data().pressure
-                # ? dà che altitudine relativa è sempre 0.0, nonostante sposti la telecamera in alto
+                # ? sembra che altitudine relativa sia sempre 0.0, nonostante sposti la telecamera in alto
                 r_alt = sensors_data.get_barometer_data().relative_altitude
                 # non restituisce il formato giusto. Inoltre quando sta ferma sembra che dica che si muove
-                mov = sensors_data.camera_moving_state
-                tLeft = sensors_data.get_temperature_data().get(sl.ONBOARD_LEFT)
-                tRight = sensors_data.get_temperature_data.get(sl.ONBOARD_RIGHT)
-                tImu = sensors_data.get_temperature_data().get(sl.IMU)
-                tBar = sensors_data.get_temperature_data(sl.BAROMETER)
+                # mov è 0 se telecamera è ferma, 1 se si muove e -1 se sta cadendo
+                mov = 0 if sensors_data.camera_moving_state == sl.CAMERA_MOTION_STATE.STATIC else 1
+                if sensors_data.camera_moving_state == sl.CAMERA_MOTION_STATE.FALLING:
+                    mov = -1
+                tLeft = sensors_data.get_temperature_data().get(sl.SENSOR_LOCATION.ONBOARD_LEFT)
+                tRight = sensors_data.get_temperature_data().get(sl.SENSOR_LOCATION.ONBOARD_RIGHT)
+                tImu = sensors_data.get_temperature_data().get(sl.SENSOR_LOCATION.IMU)
+                tBar = sensors_data.get_temperature_data().get(sl.SENSOR_LOCATION.BAROMETER)
                 data_list.append(ImuData.ImuData(imuT, magT, barT, accX, accY, accZ, gyrX, gyrY, gyrZ, magX, magY, magZ, orX, orY, orZ, press, r_alt, mov, tLeft, tRight, tImu, tBar))
                 i += 1
-                time.sleep(0.1)
+                # time.sleep(0.1)
     write_xlsx(data_list)
     zed.close()
     return 0
