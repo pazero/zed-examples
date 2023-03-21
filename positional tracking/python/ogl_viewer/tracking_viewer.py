@@ -9,8 +9,11 @@ from threading import Lock
 import numpy as np
 import array
 
-import ogl_viewer.zed_model as zm
+#import ogl_viewer.zed_model as zm
+import zed_model as zm
 import pyzed.sl as sl
+
+#from ..positional_tracking import reboot_btn
 
 VERTEX_SHADER = """
 # version 330 core
@@ -39,7 +42,6 @@ def safe_glutBitmapString(font, str_):
 
 class Shader:
     def __init__(self, _vs, _fs):
-
         self.program_id = glCreateProgram()
         vertex_id = self.compile(GL_VERTEX_SHADER, _vs)
         fragment_id = self.compile(GL_FRAGMENT_SHADER, _fs)
@@ -406,7 +408,8 @@ class GLViewer:
 
         self.zedModel.draw()
         glUseProgram(0)
-        
+
+
     def print_text(self):
         glMatrixMode(GL_PROJECTION)
         glPushMatrix()
