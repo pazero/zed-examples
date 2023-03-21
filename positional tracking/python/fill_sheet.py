@@ -75,7 +75,8 @@ def write_xlsx(sheet_list):
     now += str(datetime.datetime.now().month) + '/'
     now += str(datetime.datetime.now().year) + ' '
     now += str(datetime.datetime.now().hour) + ':'
-    now += str(datetime.datetime.now().minute) if datetime.datetime.now().minute > 9 else '0' + str(datetime.datetime.now().minute)
+    mins = datetime.datetime.now().minute
+    now += str(mins) if mins > 9 else '0' + str(mins)
     print(now)
     if len(sheet_list) == 0:
         return
