@@ -165,12 +165,12 @@ def main():
         exit(1)
 
     # Used to store the sensors timestamp to know if the sensors_data is a new one or not
-
+    """
     printSensorParameters(info.sensors_configuration.accelerometer_parameters)  # accelerometer configuration
     printSensorParameters(info.sensors_configuration.gyroscope_parameters)  # gyroscope configuration
     printSensorParameters(info.sensors_configuration.magnetometer_parameters)  # magnetometer configuration
     printSensorParameters(info.sensors_configuration.barometer_parameters)  # barometer configuration
-
+    """
     data_list = []
     ts_handler = TimestampHandler()
     sensors_data = sl.SensorsData()
@@ -209,16 +209,16 @@ def main():
                 r_alt = sensors_data.get_barometer_data().relative_altitude
                 # non restituisce il formato giusto. Inoltre quando sta ferma sembra che dica che si muove
                 # mov è 0 se telecamera è ferma, 1 se si muove e -1 se sta cadendo
-                mov = 0 if sensors_data.camera_moving_state == sl.CAMERA_MOTION_STATE.STATIC else 1
-                if sensors_data.camera_moving_state == sl.CAMERA_MOTION_STATE.FALLING:
-                    mov = -1
+                mov = 0 if sensors_data.camera_moving_state == sl.CAMERA_MOTION_STATE.STATIC else 1 if sensors_data.camera_moving_state == sl.CAMERA_MOTION_STATE.MOVING else -1
+                #if sensors_data.camera_moving_state == sl.CAMERA_MOTION_STATE.FALLING:
+                #    mov = -1
                 tLeft = sensors_data.get_temperature_data().get(sl.SENSOR_LOCATION.ONBOARD_LEFT)
                 tRight = sensors_data.get_temperature_data().get(sl.SENSOR_LOCATION.ONBOARD_RIGHT)
                 tImu = sensors_data.get_temperature_data().get(sl.SENSOR_LOCATION.IMU)
                 tBar = sensors_data.get_temperature_data().get(sl.SENSOR_LOCATION.BAROMETER)
                 data_list.append(ImuData.ImuData(imuT, magT, barT, accX, accY, accZ, gyrX, gyrY, gyrZ, magX, magY, magZ, orX, orY, orZ, press, r_alt, mov, tLeft, tRight, tImu, tBar))
                 i += 1
-                # time.sleep(0.1)
+    print(len(data_list))
     write_xlsx(data_list)
     zed.close()
     return 0
