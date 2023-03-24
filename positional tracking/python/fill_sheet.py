@@ -89,9 +89,9 @@ def write_xlsx(sheet_list):
 
     worksheet.write('A1', 'v2')
     worksheet.write('B1', now)
-    worksheet.write('A2', nameof(imu.imu_Timestamp) + '[nanosec]')
-    worksheet.write('B2', nameof(imu.mag_Timestamp) + '[nanosec]')
-    worksheet.write('C2', nameof(imu.baro_Timestamp) + '[nanosec]')
+    worksheet.write('A2', nameof(imu.imu_Timestamp) + '[sec]')
+    worksheet.write('B2', nameof(imu.mag_Timestamp) + '[sec]')
+    worksheet.write('C2', nameof(imu.baro_Timestamp) + '[sec]')
     worksheet.write('D2', nameof(imu.accX) + '[m/s^2]')
     worksheet.write('E2', nameof(imu.accY) + '[m/s^2]')
     worksheet.write('F2', nameof(imu.accZ) + '[m/s^2]')
