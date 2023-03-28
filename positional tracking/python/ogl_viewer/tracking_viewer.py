@@ -9,8 +9,8 @@ from threading import Lock
 import numpy as np
 import array
 
-#import ogl_viewer.zed_model as zm
-import zed_model as zm
+import ogl_viewer.zed_model as zm
+#import zed_model as zm
 import pyzed.sl as sl
 
 #from ..positional_tracking import reboot_btn

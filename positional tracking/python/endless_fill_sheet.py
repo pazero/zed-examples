@@ -21,6 +21,8 @@
 import pyzed.sl as sl
 import datetime
 import xlsxwriter
+from openpyxl import load_workbook
+from openpyxl.formula import Tokenizer
 from varname import nameof
 import ImuData
 import math
@@ -67,6 +69,14 @@ def printSensorParameters(sensor_parameters):
             print("Random Walk: "  + str(sensor_parameters.random_walk) + " " + str(sensor_parameters.sensor_unit) + "/s/√Hz")
 
 # def dot2comma(str):
+def update_sheet():
+    wb = load_workbook(filename="updateData.xlsx")
+    ws = wb["grafici"]
+    # fino a qui
+    treeData = [["Type", "Leaf Color", "Height"], ["Maple", "Red", 549], ["Oak", "Green", 783], ["Pine", "Green", 1204]]
+    for r in treeData:
+        ws.append(r)
+    wb.save("updateData.xlsx")
 
 def write_xlsx(sheet_list):
     now = str(datetime.datetime.now().day) + '/'
@@ -80,64 +90,75 @@ def write_xlsx(sheet_list):
         return
     imu = sheet_list[0]
 
-    workbook = xlsxwriter.Workbook('data.xlsx')
+    wb = load_workbook(filename="updateData.xlsx")
+    ws_dati = wb["dati"]
+    wb.remove(ws_dati)
+    ws_dati = wb.create_sheet("dati", 0)
+    ws_dati.title = "dati"
 
-    # The workbook object is then used to add new worksheet via the add_worksheet() method.
-    worksheet = workbook.add_worksheet()
+    ws_dati.cell(column=1, row=1).value = 'v2'
+    ws_dati.cell(column=2, row=1).value = now
+    ws_dati.cell(column=1, row=2).value = nameof(imu.imu_Timestamp) + '[sec]'
+    ws_dati.cell(column=2, row=2).value = nameof(imu.mag_Timestamp) + '[sec]'
+    ws_dati.cell(column=3, row=2).value = nameof(imu.baro_Timestamp) + '[sec]'
+    ws_dati.cell(column=4, row=2).value = nameof(imu.accX) + '[m/s^2]'
+    ws_dati.cell(column=5, row=2).value = nameof(imu.accY) + '[m/s^2]'
+    ws_dati.cell(column=6, row=2).value = nameof(imu.accZ) + '[m/s^2]'
+    ws_dati.cell(column=7, row=2).value = nameof(imu.gyroX) + '[deg/s]'
+    ws_dati.cell(column=8, row=2).value = nameof(imu.gyroY) + '[deg/S]'
+    ws_dati.cell(column=9, row=2).value = nameof(imu.gyroZ) + '[deg/s]'
+    ws_dati.cell(column=10, row=2).value = nameof(imu.magX) + '[uT]'
+    ws_dati.cell(column=11, row=2).value = nameof(imu.magY) + '[uT]'
+    ws_dati.cell(column=12, row=2).value = nameof(imu.magZ) + '[uT]'
+    ws_dati.cell(column=13, row=2).value = nameof(imu.orX) + '[deg]'
+    ws_dati.cell(column=14, row=2).value = nameof(imu.orY) + '[deg]'
+    ws_dati.cell(column=15, row=2).value = nameof(imu.orZ) + '[deg]'
+    ws_dati.cell(column=16, row=2).value = nameof(imu.press) + '[hPa]'
+    ws_dati.cell(column=17, row=2).value = nameof(imu.rel_alt) + '[m]'
+    ws_dati.cell(column=18, row=2).value = nameof(imu.moving)
+    ws_dati.cell(column=19, row=2).value = nameof(imu.temp_left) + '[C]'
+    ws_dati.cell(column=20, row=2).value = nameof(imu.temp_right) + '[C]'
+    ws_dati.cell(column=21, row=2).value = nameof(imu.temp_imu) + '[C]'
+    ws_dati.cell(column=22, row=2).value = nameof(imu.temp_barom) + '[C]'
+    ws_dati['X2'] = 'delta accX'
+    ws_dati['Y2'] = 'delta accY'
+    ws_dati['Z2'] = 'delta accZ'
 
-    worksheet.write('A1', 'v2')
-    worksheet.write('B1', now)
-    worksheet.write('A2', nameof(imu.imu_Timestamp) + '[sec]')
-    worksheet.write('B2', nameof(imu.mag_Timestamp) + '[sec]')
-    worksheet.write('C2', nameof(imu.baro_Timestamp) + '[sec]')
-    worksheet.write('D2', nameof(imu.accX) + '[m/s^2]')
-    worksheet.write('E2', nameof(imu.accY) + '[m/s^2]')
-    worksheet.write('F2', nameof(imu.accZ) + '[m/s^2]')
-    worksheet.write('G2', nameof(imu.gyroX) + '[deg/s]')
-    worksheet.write('H2', nameof(imu.gyroY) + '[deg/S]')
-    worksheet.write('I2', nameof(imu.gyroZ) + '[deg/s]')
-    worksheet.write('J2', nameof(imu.magX) + '[uT]')
-    worksheet.write('K2', nameof(imu.magY) + '[uT]')
-    worksheet.write('L2', nameof(imu.magZ) + '[uT]')
-    worksheet.write('M2', nameof(imu.orX) + '[deg]')
-    worksheet.write('N2', nameof(imu.orY) + '[deg]')
-    worksheet.write('O2', nameof(imu.orZ) + '[deg]')
-    worksheet.write('P2', nameof(imu.press) + '[hPa]')
-    worksheet.write('Q2', nameof(imu.rel_alt) + '[m]')
-    worksheet.write('R2', nameof(imu.moving))
-    worksheet.write('S2', nameof(imu.temp_left) + '[C]')
-    worksheet.write('T2', nameof(imu.temp_right) + '[C]')
-    worksheet.write('U2', nameof(imu.temp_imu) + '[C]')
-    worksheet.write('V2', nameof(imu.temp_barom) + '[C]')
-
-    riga = 3
+    offset_riga = 3
+    riga = offset_riga
     for i in sheet_list:
-        worksheet.write('A' + str(riga), i.imu_Timestamp)
-        worksheet.write('B' + str(riga), i.mag_Timestamp)
-        worksheet.write('C' + str(riga), i.baro_Timestamp)
-        worksheet.write('D' + str(riga), i.accX)
-        worksheet.write('E' + str(riga), i.accY)
-        worksheet.write('F' + str(riga), i.accZ)
-        worksheet.write('G' + str(riga), i.gyroX)
-        worksheet.write('H' + str(riga), i.gyroY)
-        worksheet.write('I' + str(riga), i.gyroZ)
-        worksheet.write('J' + str(riga), i.magX)
-        worksheet.write('K' + str(riga), i.magY)
-        worksheet.write('L' + str(riga), i.magZ)
-        worksheet.write('M' + str(riga), i.orX)
-        worksheet.write('N' + str(riga), i.orY)
-        worksheet.write('O' + str(riga), i.orZ)
-        worksheet.write('P' + str(riga), i.press)
-        worksheet.write('Q' + str(riga), i.rel_alt)
-        worksheet.write('R' + str(riga), i.moving)
-        worksheet.write('S' + str(riga), i.temp_left)
-        worksheet.write('T' + str(riga), i.temp_right)
-        worksheet.write('U' + str(riga), i.temp_imu)
-        worksheet.write('V' + str(riga), i.temp_barom)
+        ws_dati['A'+str(riga)] = i.imu_Timestamp
+        # ws_dati.cell(column=1, row=riga).value = i.imu_Timestamp
+        ws_dati.cell(column=2, row=riga).value = i.mag_Timestamp
+        ws_dati.cell(column=3, row=riga).value = i.baro_Timestamp
+        ws_dati.cell(column=4, row=riga).value = i.accX
+        ws_dati.cell(column=5, row=riga).value = i.accY
+        ws_dati.cell(column=6, row=riga).value = i.accZ
+        ws_dati.cell(column=7, row=riga).value = i.gyroX
+        ws_dati.cell(column=8, row=riga).value = i.gyroY
+        ws_dati.cell(column=9, row=riga).value = i.gyroZ
+        ws_dati.cell(column=10, row=riga).value = i.magX
+        ws_dati.cell(column=11, row=riga).value = i.magY
+        ws_dati.cell(column=12, row=riga).value = i.magZ
+        ws_dati.cell(column=13, row=riga).value = i.orX
+        ws_dati.cell(column=14, row=riga).value = i.orY
+        ws_dati.cell(column=15, row=riga).value = i.orZ
+        ws_dati.cell(column=16, row=riga).value = i.press
+        ws_dati.cell(column=17, row=riga).value = i.rel_alt
+        ws_dati.cell(column=18, row=riga).value = i.moving
+        ws_dati.cell(column=19, row=riga).value = i.temp_left
+        ws_dati.cell(column=20, row=riga).value = i.temp_right
+        ws_dati.cell(column=21, row=riga).value = i.temp_imu
+        ws_dati.cell(column=22, row=riga).value = i.temp_barom
 
+        if not riga == offset_riga:
+            end = str(riga) + '*(A' + str(riga) + '-A' + str(riga-1) + ')^2'
+            ws_dati['X'+str(riga)] = '=0.5*D' + end
+            ws_dati['Y'+str(riga)] = '=0.5*E' + end
+            ws_dati['Z'+str(riga)] = '=0.5*F' + end
         riga += 1
 
-    workbook.close()
+    wb.save("updateData.xlsx")
 
 
 def main():
@@ -173,6 +194,7 @@ def main():
     ts_handler = TimestampHandler()
     sensors_data = sl.SensorsData()
     i = 0
+
     while True:
         if keyboard.is_pressed('enter'):
             break
@@ -210,8 +232,6 @@ def main():
                 # non restituisce il formato giusto. Inoltre quando sta ferma sembra che dica che si muove
                 # mov è 0 se telecamera è ferma, 1 se si muove e -1 se sta cadendo
                 mov = 0 if sensors_data.camera_moving_state == sl.CAMERA_MOTION_STATE.STATIC else 1 if sensors_data.camera_moving_state == sl.CAMERA_MOTION_STATE.MOVING else -1
-                #if sensors_data.camera_moving_state == sl.CAMERA_MOTION_STATE.FALLING:
-                #    mov = -1
                 tLeft = sensors_data.get_temperature_data().get(sl.SENSOR_LOCATION.ONBOARD_LEFT)
                 tRight = sensors_data.get_temperature_data().get(sl.SENSOR_LOCATION.ONBOARD_RIGHT)
                 tImu = sensors_data.get_temperature_data().get(sl.SENSOR_LOCATION.IMU)
@@ -227,3 +247,4 @@ def main():
 if __name__ == "__main__":
     main()
 
+# =SCARTO(dati!$AC$3;0;0;CONTA.VALORI(dati!$AC:$AC)-1;1)
