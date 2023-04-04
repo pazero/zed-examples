@@ -164,7 +164,6 @@ def write_xlsx(sheet_list):
 def main():
     # Create a Camera object
     zed = sl.Camera()
-
     init_params = sl.InitParameters()
     init_params.depth_mode = sl.DEPTH_MODE.NONE
 
@@ -177,21 +176,21 @@ def main():
 
     # Get camera information sensors_data
     info = zed.get_camera_information()
-
     cam_model = info.camera_model
     if cam_model == sl.MODEL.ZED:
         print("This tutorial only supports ZED-M and ZED2 camera models, ZED does not have additional sensors")
         exit(1)
 
-    # Used to store the sensors timestamp to know if the sensors_data is a new one or not
     """
     printSensorParameters(info.sensors_configuration.accelerometer_parameters)  # accelerometer configuration
     printSensorParameters(info.sensors_configuration.gyroscope_parameters)  # gyroscope configuration
     printSensorParameters(info.sensors_configuration.magnetometer_parameters)  # magnetometer configuration
     printSensorParameters(info.sensors_configuration.barometer_parameters)  # barometer configuration
     """
-    data_list = []
+    # Used to store the sensors timestamp to know if the sensors_data is a new one or not
     ts_handler = TimestampHandler()
+
+    data_list = []
     sensors_data = sl.SensorsData()
     i = 0
 
