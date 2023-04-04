@@ -247,4 +247,4 @@ def main():
 if __name__ == "__main__":
     main()
 
-# =SCARTO(dati!$AC$3;0;0;CONTA.VALORI(dati!$AC:$AC)-1;1)
+# =SCARTO(sides!$E$3;0;0;CONTA.VALORI(dati!$E:$E)-1;1)
