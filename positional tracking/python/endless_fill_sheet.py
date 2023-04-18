@@ -193,7 +193,7 @@ def main():
     data_list = []
     sensors_data = sl.SensorsData()
     i = 0
-
+    print("go!!")
     while True:
         if keyboard.is_pressed('enter'):
             break
@@ -229,7 +229,9 @@ def main():
                 # ? sembra che altitudine relativa sia sempre 0.0, nonostante sposti la telecamera in alto
                 r_alt = sensors_data.get_barometer_data().relative_altitude
                 # non restituisce il formato giusto. Inoltre quando sta ferma sembra che dica che si muove
-                # mov è 0 se telecamera è ferma, 1 se si muove e -1 se sta cadendo
+                # mov è 0 se telecamera è ferma, 1 se si
+                #
+                # muove e -1 se sta cadendo
                 mov = 0 if sensors_data.camera_moving_state == sl.CAMERA_MOTION_STATE.STATIC else 1 if sensors_data.camera_moving_state == sl.CAMERA_MOTION_STATE.MOVING else -1
                 tLeft = sensors_data.get_temperature_data().get(sl.SENSOR_LOCATION.ONBOARD_LEFT)
                 tRight = sensors_data.get_temperature_data().get(sl.SENSOR_LOCATION.ONBOARD_RIGHT)
