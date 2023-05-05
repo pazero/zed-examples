@@ -201,6 +201,8 @@ def main():
             # Check if the data has been updated since the last time. IMU is the sensor with the highest rate
             imu_data = sensors_data.get_imu_data()
             if ts_handler.is_new(imu_data):
+                if i % 500 == 0:
+                    print(i)
                 # da prendere: quaternioni, translation e imu_orientation
                 #print(imu_data.timestamp.data_ns)
                 imu_or = imu_data.get_pose().get_orientation().get()
