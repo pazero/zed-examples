@@ -210,10 +210,13 @@ def main():
                 imu_acc = imu_data.get_linear_acceleration()
                 mag_data = sensors_data.get_magnetometer_data().get_magnetic_field_calibrated()
                 # non restituisce timestamp i dati nella forma giusta
-                imuT = 0.000000001 * imu_data.timestamp.data_ns
+                #imuT = 0.000000001 * imu_data.timestamp.data_ns
+                imuT = imu_data.timestamp.get_milliseconds()
                 # print(imuT)
-                magT = 0.000000001 * sensors_data.get_magnetometer_data().timestamp.data_ns
-                barT = 0.000000001 * sensors_data.get_barometer_data().timestamp.data_ns
+                #magT = 0.000000001 * sensors_data.get_magnetometer_data().timestamp.data_ns
+                magT = sensors_data.get_magnetometer_data().timestamp.get_milliseconds()
+                #barT = 0.000000001 * sensors_data.get_barometer_data().timestamp.data_ns
+                barT = sensors_data.get_barometer_data().timestamp.get_milliseconds()
                 accX = imu_acc[0]
                 accY = imu_acc[1]
                 accZ = imu_acc[2]
