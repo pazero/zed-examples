@@ -222,6 +222,10 @@ def main():
                 accY = imu_acc[1]
                 accZ = imu_acc[2]
                 gyrX = imu_vel[0]
+
+
+
+                
                 gyrY = imu_vel[1]
                 gyrZ = imu_vel[2]
                 magX = mag_data[0]
@@ -229,6 +233,7 @@ def main():
                 magZ = mag_data[2]
                 orX = imu_or[0]
                 orY = imu_or[1]
+
                 orZ = imu_or[2]
                 #prova
                 press = sensors_data.get_barometer_data().pressure

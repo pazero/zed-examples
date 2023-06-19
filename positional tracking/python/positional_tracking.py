@@ -27,6 +27,7 @@ import sys
 import ogl_viewer.tracking_viewer as gl
 import pyzed.sl as sl
 
+
 def print_pose_value(pose):
     print("\npose: ", pose)
     timestamp = pose.timestamp.get_nanoseconds()
@@ -72,7 +73,6 @@ def reboot_btn():
 
 
 if __name__ == "__main__":
-
     init_params = sl.InitParameters(camera_resolution=sl.RESOLUTION.HD720,
                                  coordinate_units=sl.UNIT.METER,
                                  coordinate_system=sl.COORDINATE_SYSTEM.RIGHT_HANDED_Y_UP)
@@ -85,7 +85,6 @@ if __name__ == "__main__":
         init_params.set_from_svo_file(filepath)
 
     zed = sl.Camera()
-
 
     status = zed.open(init_params)
     if status != sl.ERROR_CODE.SUCCESS:
@@ -119,7 +118,6 @@ if __name__ == "__main__":
     text_rotation = ""
     text_accuracy = ""
     text_confidence = ""
-
     while viewer.is_available():
         if zed.grab(runtime) == sl.ERROR_CODE.SUCCESS:
             if zed.get_sensors_data(sensors_data, sl.TIME_REFERENCE.CURRENT) == sl.ERROR_CODE.SUCCESS:
