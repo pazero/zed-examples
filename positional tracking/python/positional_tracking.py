@@ -27,7 +27,6 @@ import sys
 import ogl_viewer.tracking_viewer as gl
 import pyzed.sl as sl
 
-
 def print_pose_value(pose):
     print("\npose: ", pose)
     timestamp = pose.timestamp.get_nanoseconds()

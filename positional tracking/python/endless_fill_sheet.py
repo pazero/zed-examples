@@ -208,7 +208,7 @@ def main():
                 #imu_or = imu_data.get_pose().get_orientation().get()
                 imu_or = imu_data.get_pose().get_euler_angles(radian=False)
                 imu_vel = imu_data.get_angular_velocity()
-                imu_acc = imu_data.get_linear_acceleration()
+                imu_acc = imu_data.get_linear_acceleration_uncalibrated()
                 mag_data = sensors_data.get_magnetometer_data().get_magnetic_field_calibrated()
                 # non restituisce timestamp i dati nella forma giusta
                 #imuT = 0.000000001 * imu_data.timestamp.data_ns
@@ -222,18 +222,14 @@ def main():
                 accY = imu_acc[1]
                 accZ = imu_acc[2]
                 gyrX = imu_vel[0]
-
-
-
-                
                 gyrY = imu_vel[1]
                 gyrZ = imu_vel[2]
+
                 magX = mag_data[0]
                 magY = mag_data[1]
                 magZ = mag_data[2]
                 orX = imu_or[0]
                 orY = imu_or[1]
-
                 orZ = imu_or[2]
                 #prova
                 press = sensors_data.get_barometer_data().pressure
